@@ -43,6 +43,9 @@ public class LifePane extends Pane {
     private final Canvas canvas;
     private final Timeline animation;
     private final Random gen = new Random();
+    
+    //added by Jeffrey Miller
+    private boolean wrapAround;
 
     public LifePane(Label lbStatus) {
         this.lbStatus = lbStatus;
@@ -193,54 +196,64 @@ public class LifePane extends Pane {
         int[][] cellsng = new int[xCellCount][yCellCount];
         for (int x = 0; x < xCellCount; x++) {
             for (int y = 0; y < yCellCount; y++) {
+                if(!wrapAround){
+                    if(x == 0 || x == xCellCount -1
+                            || y == 0 || y == yCellCount -1){
+                     continue;   
+                    }
+                }
                 int neighbors = 0;
-                if (x > 0 && x < xCellCount - 1 && y > 0 && y < yCellCount - 1) {
-                    if (cells[x - 1][y - 1] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x - 1][y] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x - 1][y + 1] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x][y - 1] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x][y + 1] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x + 1][y - 1] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x + 1][y] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x + 1][y + 1] == 1) {
-                        neighbors++;
-                    }
-                    if (cells[x][y] == 1) {
-                        if (neighbors < 2 || neighbors > 3) {
-                            cellsng[x][y] = 0;
-                        } else {
-                            cellsng[x][y] = 1;
-                        }
-                    } else if (neighbors == 3) {
+                int T = (y == 0) ? yCellCount-1:y-1;
+                int B = (y == yCellCount-1) ? 0 : y+1;
+                int L = (x == 0) ? xCellCount-1:x-1;
+                int R = (x == xCellCount -1) ? 0 : x+1;
+                
+                //check top
+                neighbors += checkCell(L,T); //TL
+                neighbors += checkCell(x,T); //T
+                neighbors += checkCell(R,T); //TR
+                //check bottom
+                neighbors += checkCell(L,B);
+                neighbors += checkCell(x,B);
+                neighbors += checkCell(R,B);
+                //check right
+                neighbors += checkCell(L,y);
+                //check left
+                neighbors += checkCell(R,y);
+                if (cells[x][y] == 1) {
+                    if (neighbors < 2 || neighbors > 3) {
+                        cellsng[x][y] = 0;
+                    } else {
                         cellsng[x][y] = 1;
                     }
-                } else {
-                    cellsng[x][y] = 0;
+                } else if (neighbors == 3) {
+                    cellsng[x][y] = 1;
                 }
             }
         }
         cells = cellsng;
     }
+    /**
+     * Used to simplify calculating the next generation of cells
+     * @param x the x coordinate of the cell to check
+     * @param y the y coordinate of the cell to check
+     * @return 1 if the cell is alive, 0 if the cell is dead
+     */
+    public int checkCell(int x, int y){
+        return cells[x][y];
+    }
 
     public void setShowColors(boolean showColors) {
         this.showColors = showColors;
     }
-
     public boolean getShowColors() {
         return this.showColors;
+    }
+
+    public boolean isWrapAround() {
+        return wrapAround;
+    }
+    public void setWrapAround(boolean wrapAround) {
+        this.wrapAround = wrapAround;
     }
 }

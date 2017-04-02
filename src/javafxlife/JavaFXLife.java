@@ -86,6 +86,7 @@ public class JavaFXLife extends Application {
             lifePane.pause();
             lifePane.clearCells();
             FileChooser fileChooser = new FileChooser();
+            setupFileChooser(fileChooser);
             File file = fileChooser.showOpenDialog(pStage);
             if (file != null) {
                 readFile(file);
@@ -98,6 +99,7 @@ public class JavaFXLife extends Application {
         save.setOnAction((ActionEvent e) -> {
             lifePane.pause();
             FileChooser fileChooser = new FileChooser();
+            setupFileChooser(fileChooser);
             File file = fileChooser.showSaveDialog(pStage);
             if (file != null) {
                 writeFile(file);
@@ -166,7 +168,13 @@ public class JavaFXLife extends Application {
         color.setAccelerator(KeyCombination.keyCombination("Ctrl+C"));
         color.setOnAction(e -> lifePane.setShowColors(color.isSelected()));
         optionsMenu.getItems().add(color);
+        
+        CheckMenuItem wrapAround = new CheckMenuItem("Wrap around");
+        wrapAround.setAccelerator(KeyCombination.keyCombination("Ctrl+W"));
+        wrapAround.setOnAction(e -> lifePane.setWrapAround(wrapAround.isSelected()));
+        optionsMenu.getItems().add(wrapAround);
 
+        
         /**
          * *********************************************************************
          * Help Menu Section
@@ -261,6 +269,21 @@ public class JavaFXLife extends Application {
         } catch (IOException ex) {
             Logger.getLogger(JavaFXLife.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    /**
+     * Initializes the FileChoosers starting directory and allowable file
+     * formats.
+     * @param fileChooser
+     */
+    public void setupFileChooser(FileChooser fileChooser){
+        fileChooser.setInitialDirectory(
+            new File(System.getProperty("user.dir"))
+        ); 
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Text", "*.txt"),
+            new FileChooser.ExtensionFilter("Data", "*.dat"),
+            new FileChooser.ExtensionFilter("All", "*.*")
+        );        
     }
 
     /**
