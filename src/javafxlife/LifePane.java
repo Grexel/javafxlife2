@@ -8,6 +8,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -27,7 +28,7 @@ import javafx.util.Duration;
  *
  * @author John Phillips
  */
-public class LifePane extends Pane {
+public class LifePane extends ScrollPane {
 
     private final int CELLWIDTH = 10;
     private final int CELLHEIGHT = 10;
@@ -43,13 +44,12 @@ public class LifePane extends Pane {
     private final Canvas canvas;
     private final Timeline animation;
     private final Random gen = new Random();
-    
+    private boolean playing;
     //added by Jeffrey Miller
     private boolean wrapAround;
 
     public LifePane(Label lbStatus) {
         this.lbStatus = lbStatus;
-
         // set the x,y cell count proportional to the screen size or 100 whichever is greater
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         int screenWidth = (int) primaryScreenBounds.getWidth();
@@ -71,6 +71,9 @@ public class LifePane extends Pane {
 
         // a canvas is used to display a visual representation of the simulation
         canvas = new Canvas();
+        canvas.setWidth(screenWidth);
+        canvas.setHeight(screenHeight);
+        this.setContent(canvas);
 
         // each rectangular cell can be clicked to turn it on or off
         canvas.setOnMouseClicked((MouseEvent event) -> {
@@ -81,12 +84,6 @@ public class LifePane extends Pane {
             drawCells();
         });
 
-        // must bind canvas to pane or nothing will display
-        canvas.widthProperty().bind(this.widthProperty());
-        canvas.heightProperty().bind(this.heightProperty());
-
-        this.getChildren().add(canvas);
-
         animation = new Timeline(
                 new KeyFrame(Duration.millis(1000), e -> {
                     nextGeneration();
@@ -95,14 +92,17 @@ public class LifePane extends Pane {
         );
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
+        playing = true;
     }
 
     public void play() {
         animation.play();
+        setPlaying(true);
     }
 
     public void pause() {
         animation.pause();
+        setPlaying(false);
     }
 
     public void increaseSpeed() {
@@ -255,5 +255,13 @@ public class LifePane extends Pane {
     }
     public void setWrapAround(boolean wrapAround) {
         this.wrapAround = wrapAround;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 }
